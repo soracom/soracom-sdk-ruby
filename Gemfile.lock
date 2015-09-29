@@ -1,0 +1,47 @@
+PATH
+  remote: .
+  specs:
+    soracom (1.0.1)
+      io-console
+      thor
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    coderay (1.1.0)
+    diff-lcs (1.2.5)
+    io-console (0.4.2)
+    method_source (0.8.2)
+    pry (0.10.2)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+    rake (10.4.2)
+    rspec (3.3.0)
+      rspec-core (~> 3.3.0)
+      rspec-expectations (~> 3.3.0)
+      rspec-mocks (~> 3.3.0)
+    rspec-core (3.3.2)
+      rspec-support (~> 3.3.0)
+    rspec-expectations (3.3.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.3.0)
+    rspec-mocks (3.3.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.3.0)
+    rspec-support (3.3.0)
+    slop (3.6.0)
+    thor (0.19.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler (~> 1.9)
+  pry
+  rake (~> 10.0)
+  rspec
+  soracom!
+
+BUNDLED WITH
+   1.10.3
