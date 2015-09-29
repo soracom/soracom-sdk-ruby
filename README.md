@@ -38,7 +38,7 @@ imsis = sims.map { |sim| sim['imsi'] }
 puts 'change plan to s1.fast'
 
 # プラン変更のためのAPIをコールする
-client.client.update_subscriber_speed_class(imsis, 's1.fast')
+client.update_subscriber_speed_class(imsis, 's1.fast')
 
 puts 'done'
 
