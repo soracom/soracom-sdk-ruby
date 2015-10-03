@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    soracom (1.0.1)
+    soracom (1.0.2)
       io-console
       thor
 
@@ -44,4 +44,4 @@ DEPENDENCIES
   soracom!
 
 BUNDLED WITH
-   1.10.3
+   1.10.6
