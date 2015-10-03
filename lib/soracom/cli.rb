@@ -134,11 +134,10 @@ module SoracomCli
     end
     
     desc 'create', 'create group'
-    option :parameters, type: :hash, desc: 'group parameters'
     option :tags, type: :hash, desc: 'group tags'
     def create
       client = Soracom::Client.new
-      puts JSON.pretty_generate(client.create_group(options.parameters, options.tags))
+      puts JSON.pretty_generate(client.create_group(options.tags))
     end
     
     desc 'delete_group', 'delete a group'
