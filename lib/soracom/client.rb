@@ -201,10 +201,8 @@ module Soracom
     end
 
     # SIMグループを新規作成
-    def create_group(parameters:nil, tags:nil)
-      payload = {}
-      payload['parameters'] = parameters if parameters
-      payload['tags'] = tags if tags
+    def create_group(tags=nil)
+      payload = (tags) ? { tags: tags } : {}
       @api.post(path: '/groups', payload: payload)
     end
 
