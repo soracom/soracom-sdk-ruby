@@ -184,7 +184,7 @@ module SoracomCli
   
   # EventHandler related commands
   class EventHandler < Thor
-    desc 'list', 'list groups'
+    desc 'list', 'list event handlers'
     option :handler_id, type: :string, desc: 'group ID'
     option :imsi, type: :string, desc: 'SIM unique ID, 15 digits'
     option :target, type: :string, desc: 'target can be operator/imsi/tag'

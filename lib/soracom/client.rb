@@ -116,7 +116,6 @@ module Soracom
         end
       end
       threads.each(&:join)
-      p result
       result
     end
 
