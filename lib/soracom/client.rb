@@ -62,6 +62,7 @@ module Soracom
 
     # SIMの利用開始(再開)
     def activate_subscriber(imsis)
+      imsis = [imsis] if imsis.class != Array
       threads = [], result = []
       imsis.map do |imsi|
         threads << Thread.new do
@@ -74,6 +75,7 @@ module Soracom
 
     # SIMの利用休止
     def deactivate_subscriber(imsis)
+      imsis = [imsis] if imsis.class != Array
       threads = [], result = []
       imsis.map do |imsi|
         threads << Thread.new do
@@ -86,6 +88,7 @@ module Soracom
 
     # SIMの解約
     def terminate_subscriber(imsis)
+      imsis = [imsis] if imsis.class != Array
       threads = [], result = []
       imsis.map do |imsi|
         threads << Thread.new do
@@ -98,6 +101,7 @@ module Soracom
 
     # 指定されたSubscriberをTerminate可能に設定する
     def enable_termination(imsis)
+      imsis = [imsis] if imsis.class != Array
       threads = [], result = []
       imsis.map do |imsi|
         threads << Thread.new do
@@ -110,6 +114,7 @@ module Soracom
 
     # 指定されたSubscriberをTerminate不可能に設定する
     def disable_termination(imsis)
+      imsis = [imsis] if imsis.class != Array
       threads = [], result = []
       imsis.map do |imsi|
         threads << Thread.new do
@@ -122,6 +127,7 @@ module Soracom
 
     # タグの更新
     def update_subscriber_tags(imsis, tags)
+      imsis = [imsis] if imsis.class != Array
       threads = [], result = []
       imsis.map do |imsi|
         threads << Thread.new do
@@ -134,6 +140,7 @@ module Soracom
 
     # 指定タグの削除
     def delete_subscriber_tag(imsis, tag_name)
+      imsis = [imsis] if imsis.class != Array
       threads = [], result = []
       imsis.map do |imsi|
         threads << Thread.new do
@@ -146,7 +153,7 @@ module Soracom
 
     # SIMのプラン変更
     def update_subscriber_speed_class(imsis, speed_class)
-      imsis = [imsis] if imsis.class == String
+      imsis = [imsis] if imsis.class != Array
       threads = [], result = []
       imsis.map do |imsi|
         threads << Thread.new do
@@ -159,6 +166,7 @@ module Soracom
 
     # SIMの有効期限設定
     def set_expiry_time(imsis, expiry_time)
+      imsis = [imsis] if imsis.class != Array
       threads = [], result = []
       imsis.map do |imsi|
         threads << Thread.new do
@@ -171,6 +179,7 @@ module Soracom
 
     # SIMの有効期限設定を解除
     def unset_expiry_time(imsis)
+      imsis = [imsis] if imsis.class != Array
       threads = [], result = []
       imsis.map do |imsi|
         threads << Thread.new do
