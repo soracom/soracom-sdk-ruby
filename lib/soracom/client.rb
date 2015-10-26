@@ -1,5 +1,6 @@
 require 'net/http'
 require 'uri'
+require 'cgi'
 require 'json'
 require 'base64'
 require 'ostruct'
@@ -136,7 +137,7 @@ module Soracom
       threads = [], result = []
       imsis.map do |imsi|
         threads << Thread.new do
-          result << { 'imsi' => imsi }.merge(@api.delete(path: "/subscribers/#{imsi}/tags/#{tag_name}"))
+          result << { 'imsi' => imsi }.merge(@api.delete(path: "/subscribers/#{imsi}/tags/#{CGI.escape(tag_name)}"))
         end
       end
       threads.each(&:join)
