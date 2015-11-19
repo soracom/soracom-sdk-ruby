@@ -87,7 +87,7 @@ $ soracom subscriber list | jq -r '.[].imsi' | tee imsi.txt
 
 複数のSIMに対して、プランを s1.fast に変更する
 ```
-$ soracom subscriber update_speed_class --imsi $(cat imsi.txt) --type s1.fast
+$ soracom subscriber update_speed_class --imsi $(cat imsi.txt) --speed-class s1.fast
 [
   {
     (変更後のSIMの情報)
