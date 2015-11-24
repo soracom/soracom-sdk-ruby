@@ -59,6 +59,7 @@ testing authentication...
 authentication succeeded.
 apiKey: APIキー
 operatorId: OPで始まるオペレータID
+token: APIトークン
 ```
 
 #### 使用例
