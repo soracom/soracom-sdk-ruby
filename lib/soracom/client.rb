@@ -316,6 +316,11 @@ module Soracom
       @auth[:operatorId]
     end
 
+    # トークンを取得
+    def token
+      @auth[:token]
+    end
+
     private
 
     # authenticate by email and password

@@ -278,6 +278,7 @@ module SoracomCli
 authentication succeeded.
 apiKey: #{client.api_key}
 operatorId: #{client.operator_id}
+token: #{client.token}
 EOS
       rescue => evar
         abort 'ERROR: ' + evar.to_s
