@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    soracom (1.0.5)
+    soracom (1.0.7)
       io-console
       thor
 
