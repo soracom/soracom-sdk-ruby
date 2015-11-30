@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # coding: utf-8
 require 'soracom'
-if ENV['LANG'] =~ /[a-z][a-z]_[A-Z][A-Z]\.UTF-8$/
+if ENV['LANG'] =~ /[a-z][a-z]_[A-Z][A-Z]\.UTF-?8$/i
   SoracomCli::CLI.start
 else
   abort "LANG is not set properly to handle UTF-8. Currently set as #{ENV['LANG']}, but it should be xx_XX.UTF-8."
