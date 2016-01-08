@@ -116,7 +116,7 @@ module SoracomCli
       puts JSON.pretty_generate(client.unset_group(options[:imsi]))
     end
   end
-  
+
   # Group related commands
   class Group < Thor
     desc 'list', 'list groups'
@@ -125,28 +125,28 @@ module SoracomCli
       client = Soracom::Client.new
       puts JSON.pretty_generate(client.list_groups(options.group_id))
     end
-    
+
     desc 'list_subscribers', 'list subscriber in a group'
     option :group_id, type: :string, required:true, desc: 'group ID'
     def list_subscribers
       client = Soracom::Client.new
       puts JSON.pretty_generate(client.list_subscribers_in_group(options.group_id))
     end
-    
+
     desc 'create', 'create group'
     option :tags, type: :hash, desc: 'group tags'
     def create
       client = Soracom::Client.new
       puts JSON.pretty_generate(client.create_group(options.tags))
     end
-    
+
     desc 'delete_group', 'delete a group'
     option :group_id, type: :string, required:true, desc: 'group ID'
     def delete
       client = Soracom::Client.new
       puts JSON.pretty_generate(client.delete_group(options.group_id))
     end
-    
+
     desc 'update_configuration', 'update configuration parameter'
     option :group_id, type: :string, required:true, desc: 'group ID'
     option :namespace, type: :string, required:true, desc: 'namespace of the parameter'
@@ -155,7 +155,7 @@ module SoracomCli
       client = Soracom::Client.new
       puts JSON.pretty_generate(client.update_group_configuration(options.group_id, options.namespace, options.params))
     end
-    
+
     desc 'delete_configuration', 'delete configuration parameter'
     option :group_id, type: :string, required:true, desc: 'group ID'
     option :namespace, type: :string, required:true, desc: 'namespace of the parameter'
@@ -172,7 +172,7 @@ module SoracomCli
       client = Soracom::Client.new
       puts JSON.pretty_generate(client.update_group_tags(options.group_id, options.tags))
     end
-    
+
     desc 'delete_tag', 'delete group tag'
     option :group_id, type: :string, required:true, desc: 'group ID'
     option :name, type: :string, required:true, desc: 'tag name to delete'
@@ -181,7 +181,7 @@ module SoracomCli
       puts JSON.pretty_generate(client.delete_group_tags(options.group_id, options.name))
     end
   end
-  
+
   # EventHandler related commands
   class EventHandler < Thor
     desc 'list', 'list event handlers'
@@ -192,21 +192,21 @@ module SoracomCli
       client = Soracom::Client.new
       puts JSON.pretty_generate(client.list_event_handlers(Hash[options.map { |k, v| [k.to_sym, v] }]))
     end
-        
+
     desc 'create', 'create event handler'
     option :req, type: :string, desc: 'JSON string of event handler configuration'
     def create
       client = Soracom::Client.new
       puts JSON.pretty_generate(client.create_event_handler(options.req))
     end
-    
+
     desc 'delete', 'delete event handler'
     option :handler_id, type: :string, required:true, desc: 'Event Handler ID'
     def delete
       client = Soracom::Client.new
       puts JSON.pretty_generate(client.delete_event_handler(options.handler_id))
     end
-    
+
     desc 'update', 'update event handler configuration'
     option :handler_id, type: :string, required:true, desc: 'Event Handler ID'
     option :req, type: :string, desc: 'JSON string of event handler configuration'
@@ -215,7 +215,7 @@ module SoracomCli
       puts JSON.pretty_generate(client.update_event_handler(options.handler_id, options.req))
     end
   end
-  
+
   # Stats related commands
   class Stats < Thor
     desc 'get_air_usage', 'get air usage per Subscriber(SIM)'
@@ -228,7 +228,7 @@ module SoracomCli
       data = client.get_air_usage(Hash[options.map { |k, v| [k.to_sym, v] }])
       puts JSON.pretty_generate(data)
     end
-    
+
     desc 'get_beam_usage', 'get beam usage per Subscriber(SIM)'
     option :imsi, type: :string, required: true, desc: '15 digits SIM unique ID'
     option :from, type: :numeric, required: false, desc: 'UNIX time in seconds when stat window begins'
@@ -239,7 +239,7 @@ module SoracomCli
       data = client.get_beam_usage(Hash[options.map { |k, v| [k.to_sym, v] }])
       puts JSON.pretty_generate(data)
     end
-    
+
     desc 'export_air_usage', 'export air usage for all Subscriber(SIM)s in csv format'
     option :from, type: :numeric, required: false, desc: 'UNIX time in seconds when stat window begins'
     option :to, type: :numeric, required: false, desc: 'UNIX time in seconds when stat window ends'
@@ -249,7 +249,7 @@ module SoracomCli
       csv = client.export_air_usage(Hash[options.map { |k, v| [k.to_sym, v] }])
       puts csv
     end
-    
+
     desc 'export_beam_usage', 'export beam usage for all Subscriber(SIM)s in csv format'
     option :from, type: :numeric, required: false, desc: 'UNIX time in seconds when stat window begins'
     option :to, type: :numeric, required: false, desc: 'UNIX time in seconds when stat window ends'
@@ -261,6 +261,30 @@ module SoracomCli
     end
   end
 
+  class Operator < Thor
+    desc 'create_auth_key', 'list auth keys'
+    def list_auth_keys
+      client = Soracom::Client.new
+      data = client.list_auth_keys()
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'create_auth_key', 'create new auth key'
+    def create_auth_key
+      client = Soracom::Client.new
+      data = client.create_auth_key()
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'delete_auth_key', 'delete existing auth key'
+    option :auth_key_id, type: :string, required: true, desc: 'auth key id starting "keyId-"'
+    def delete_auth_key
+      client = Soracom::Client.new
+      data = client.delete_auth_key(options.auth_key_id)
+      puts JSON.pretty_generate(data)
+    end
+  end
+
   # Using Thor for CLI Implementation
   class CLI < Thor
     register(Subscriber, 'subscriber', 'subscriber <command>', 'Subscriber related operations')
@@ -268,6 +292,7 @@ module SoracomCli
     register(Group, 'group', 'group <command>', 'Group related operations')
     register(EventHandler, 'event_handler', 'event_handler <command>', 'Event Handler related operations')
     register(Stats, 'stats', 'stats <command>', 'Stats related operations')
+    register(Operator, 'operator', 'operator <command>', 'Operator related operations')
 
     desc 'auth', 'test authentication'
     def auth

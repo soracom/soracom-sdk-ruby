@@ -12,14 +12,20 @@ module Soracom
   # Soracom API Client
   class Client
     # 設定されなかった場合には、環境変数から認証情報を取得
-    def initialize(email:ENV['SORACOM_EMAIL'], password:ENV['SORACOM_PASSWORD'], endpoint:ENV['SORACOM_ENDPOINT'])
+    def initialize(
+        endpoint:ENV['SORACOM_ENDPOINT'],
+        email:ENV['SORACOM_EMAIL'], password:ENV['SORACOM_PASSWORD'],
+        auth_key_id:ENV['SORACOM_AUTH_KEY_ID'], auth_key:ENV['SORACOM_AUTH_KEY']
+      )
       @log = Logger.new(STDERR)
       @log.level = ENV['SORACOM_DEBUG'] ? Logger::DEBUG : Logger::WARN
       begin
-        if email && password
+        if auth_key_id && auth_key
+          @auth = auth_by_key(auth_key_id, auth_key, endpoint)
+        elsif email && password
           @auth = auth(email, password, endpoint)
         else
-          fail 'Could not find any credentials(email & password)'
+          fail 'Could not find any credentials(authKeyId & authKey or email & password)'
         end
       rescue => evar
         abort 'ERROR: ' + evar.to_s
@@ -306,6 +312,18 @@ module Soracom
       "https://soracom.zendesk.com/access/jwt?jwt=#{res['token']}&return_to=#{return_to}"
     end
 
+    def list_auth_keys()
+      @api.get(path: "/operators/#{@auth[:operatorId]}/auth_keys")
+    end
+
+    def create_auth_key()
+      @api.post(path: "/operators/#{@auth[:operatorId]}/auth_keys")
+    end
+
+    def delete_auth_key(auth_key_id)
+      @api.delete(path: "/operators/#{@auth[:operatorId]}/auth_keys/#{auth_key_id}")
+    end
+
     # APIキーを取得
     def api_key
       @auth[:apiKey]
@@ -328,6 +346,18 @@ module Soracom
       endpoint = API_BASE_URL if endpoint.nil?
       res = RestClient.post endpoint + '/auth',
                             { email: email, password: password },
+                            'Content-Type' => 'application/json',
+                            'Accept' => 'application/json'
+      result = JSON.parse(res.body)
+      fail result['message'] if res.code != '200'
+      Hash[JSON.parse(res.body).map { |k, v| [k.to_sym, v] }]
+    end
+
+    # authenticate by email and password
+    def auth_by_key(auth_key_id, auth_key, endpoint)
+      endpoint = API_BASE_URL if endpoint.nil?
+      res = RestClient.post endpoint + '/auth',
+                            { authKeyId: auth_key_id, authKey: auth_key },
                             'Content-Type' => 'application/json',
                             'Accept' => 'application/json'
       result = JSON.parse(res.body)
