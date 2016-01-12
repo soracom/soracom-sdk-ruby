@@ -262,7 +262,7 @@ module SoracomCli
   end
 
   class Operator < Thor
-    desc 'create_auth_key', 'list auth keys'
+    desc 'list_auth_keys', 'list auth keys'
     def list_auth_keys
       client = Soracom::Client.new
       data = client.list_auth_keys()
