@@ -233,6 +233,7 @@ module Soracom
 
     # コンフィグパラメータの更新
     def update_group_configuration(group_id, namespace, params)
+      params = transform_json(params)
       @api.put(path: "/groups/#{group_id}/configuration/#{namespace}", payload: params)
     end
 
@@ -266,6 +267,7 @@ module Soracom
 
     # イベントハンドラーを新規作成する
     def create_event_handler(req)
+      req = transform_json req
       @api.post(path: '/event_handlers', payload: req)
     end
 
@@ -280,8 +282,9 @@ module Soracom
     end
 
     # イベントハンドラーを更新する
-    def update_event_handler(handler_id, params)
-      @api.put(path: "/event_handlers/#{handler_id}", payload: params)
+    def update_event_handler(handler_id, req)
+      req = transform_json req
+      @api.put(path: "/event_handlers/#{handler_id}", payload: req)
     end
 
     # Subscriber毎のAir使用状況を得る(デフォルトでは直近１日)
@@ -369,6 +372,18 @@ module Soracom
       encoded = jwt.split('.')[1]
       encoded += '=' * (4 - encoded.length % 4) # add padding(=) for Base64
       Base64.decode64(encoded)
+    end
+
+    def transform_json(json)
+      begin
+        target=JSON.parse(json)
+        if target.class == Hash
+          target = target.map{|k,v| {"key" => k, "value" => v}}
+        end
+      rescue JSON::ParserError
+        abort("ERROR: parameter cannot be parsed as JSON.")
+      end
+      JSON.pretty_generate target
     end
   end
 end

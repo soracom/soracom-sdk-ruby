@@ -152,6 +152,15 @@ module SoracomCli
     option :namespace, type: :string, required:true, desc: 'namespace of the parameter'
     option :params, type: :string, required:true, desc: 'JSON string of the configuration parameter'
     def update_configuration
+      if options.params=~/^[a-z]+:\/\/(.+)/
+        begin
+          content = open(options.params.sub(/^file:\/\//,'')).read
+          options['params'] = content
+        rescue Errno::ENOENT
+        rescue SocketError
+          abort "ERROR: Cannot access #{options.params}."
+        end
+      end
       client = Soracom::Client.new
       puts JSON.pretty_generate(client.update_group_configuration(options.group_id, options.namespace, options.params))
     end
@@ -196,6 +205,15 @@ module SoracomCli
     desc 'create', 'create event handler'
     option :req, type: :string, desc: 'JSON string of event handler configuration'
     def create
+      if options.req=~/^[a-z]+:\/\/(.+)/
+        begin
+          content = open(options.req.sub(/^file:\/\//,'')).read
+          options['req'] = content
+        rescue Errno::ENOENT
+        rescue SocketError
+          abort "ERROR: Cannot access #{options.req}."
+        end
+      end
       client = Soracom::Client.new
       puts JSON.pretty_generate(client.create_event_handler(options.req))
     end
@@ -211,6 +229,15 @@ module SoracomCli
     option :handler_id, type: :string, required:true, desc: 'Event Handler ID'
     option :req, type: :string, desc: 'JSON string of event handler configuration'
     def update
+      if options.req=~/^[a-z]+:\/\/(.+)/
+        begin
+          content = open(options.req.sub(/^file:\/\//,'')).read
+          options['req'] = content
+        rescue Errno::ENOENT
+        rescue SocketError
+          abort "ERROR: Cannot access #{options.req}."
+        end
+      end
       client = Soracom::Client.new
       puts JSON.pretty_generate(client.update_event_handler(options.handler_id, options.req))
     end
