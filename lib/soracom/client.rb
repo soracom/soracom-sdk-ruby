@@ -315,15 +315,133 @@ module Soracom
       "https://soracom.zendesk.com/access/jwt?jwt=#{res['token']}&return_to=#{return_to}"
     end
 
-    def list_auth_keys()
+    # SAMユーザー一覧取得
+    def list_users()
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users")
+    end
+
+    # SAMユーザーを削除する
+    def delete_user(username)
+      @api.delete(path: "/operators/#{@auth[:operatorId]}/users/#{username}")
+    end
+
+    # SAMユーザー取得
+    def get_user(username=@auth[:userName])
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users/#{username}")
+    end
+
+    # SAMユーザーを新しく追加する
+    def create_user(username, description='')
+      @api.post(path: "/operators/#{@auth[:operatorId]}/users/#{username}", payload: { description: description })
+    end
+
+    # SAMユーザーを更新する
+    def update_user(username, description='')
+      @api.put(path: "/operators/#{@auth[:operatorId]}/users/#{username}", payload: { description: description })
+    end
+
+    # SAMユーザーのAuthKey一覧取得
+    def list_users_auth_key(username=@auth[:userName])
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users/#{username}/auth_keys")
+    end
+
+    # SAMユーザーのAuthKey生成
+    def generate_users_auth_key(username=@auth[:userName])
+      @api.post(path: "/operators/#{@auth[:operatorId]}/users/#{username}/auth_keys")
+    end
+
+    # SAMユーザーのAuthKey削除
+    def delete_users_auth_key(username, auth_key_id)
+      @api.delete(path: "/operators/#{@auth[:operatorId]}/users/#{username}/auth_keys/#{auth_key_id}")
+    end
+
+    # SAMユーザーのAuthKey取得
+    def get_users_auth_key(username, auth_key_id)
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users/#{username}/auth_keys/#{auth_key_id}")
+    end
+
+    # SAMユーザーのパスワードを削除する
+    def delete_user_password(username=@auth[:userName])
+      @api.delete(path: "/operators/#{@auth[:operatorId]}/users/#{username}/password")
+    end
+
+    # SAMユーザーのパスワードがセットされているかを取得する
+    def has_user_password(username=@auth[:userName])
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users/#{username}/password")
+    end
+
+    # SAMユーザーのパスワードを作成する
+    def create_user_password(username=@auth[:userName], password)
+      @api.post(path: "/operators/#{@auth[:operatorId]}/users/#{username}/password", payload:{password: password})
+    end
+
+    # SAMユーザーの権限設定を取得する
+    def get_user_permission(username=@auth[:userName])
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users/#{username}/permission")
+    end
+
+    # SAMユーザーの権限を更新する
+    def update_user_permission(username=@auth[:userName], description, permission)
+      @api.put(path: "/operators/#{@auth[:operatorId]}/users/#{username}/permission", payload:{description: description, permission: permission})
+    end
+
+    # Role一覧取得
+    def list_roles()
+      @api.get(path: "/operators/#{@auth[:operatorId]}/roles")
+    end
+
+    # Role を削除する
+    def delete_role(role_id)
+      @api.delete(path: "/operators/#{@auth[:operatorId]}/roles/#{role_id}")
+    end
+
+    # Role を取得する
+    def get_role(role_id)
+      @api.get(path: "/operators/#{@auth[:operatorId]}/roles/#{role_id}")
+    end
+
+    # Role を新しく追加する
+    def create_role(role_id, description='', permission)
+      @api.post(path: "/operators/#{@auth[:operatorId]}/roles/#{role_id}", payload:{description: description, permission: permission})
+    end
+
+    # Role を編集する
+    def update_role(role_id, description='', permission)
+      @api.put(path: "/operators/#{@auth[:operatorId]}/roles/#{role_id}", payload:{description: description, permission: permission})
+    end
+
+    # Role に紐づくユーザーの一覧を取得する
+    def list_role_attached_users(role_id)
+      @api.get(path: "/operators/#{@auth[:operatorId]}/roles/#{role_id}/users")
+    end
+
+    # SAMユーザーのロール一覧取得
+    def list_user_roles(usre_name)
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users/#{user_name}/roles")
+    end
+
+    # SAMユーザーにロールをアタッチ
+    def attach_role_to_user(user_name)
+      @api.post(path: "/operators/#{@auth[:operatorId]}/users/#{user_name}")
+    end
+
+    # SAMユーザーからロールをデタッチ
+    def delete_role_from_user(user_name, role_id)
+      @api.delete(path: "/operators/#{@auth[:operatorId]}/users/#{user_name}/roles/#{role_id}")
+    end
+
+    # OperatorのAuthKey一覧取得
+    def list_operator_auth_keys()
       @api.get(path: "/operators/#{@auth[:operatorId]}/auth_keys")
     end
 
-    def create_auth_key()
+    # OperatorのAuthKey生成
+    def generate_operator_auth_key()
       @api.post(path: "/operators/#{@auth[:operatorId]}/auth_keys")
     end
 
-    def delete_auth_key(auth_key_id)
+    # OperatorのAuthKey削除
+    def delete_operator_auth_key(auth_key_id)
       @api.delete(path: "/operators/#{@auth[:operatorId]}/auth_keys/#{auth_key_id}")
     end
 
@@ -335,6 +453,11 @@ module Soracom
     # オペレータIDを取得
     def operator_id
       @auth[:operatorId]
+    end
+
+    # ユーザ名を取得
+    def user_name
+      @auth[:userName]
     end
 
     # トークンを取得
