@@ -289,43 +289,170 @@ module SoracomCli
   end
 
   class Operator < Thor
-    desc 'list_auth_keys', 'list auth keys'
+    desc 'list_auth_keys', 'list auth keys for Operator'
     def list_auth_keys
       client = Soracom::Client.new
-      data = client.list_auth_keys()
+      data = client.list_operator_auth_keys()
       puts JSON.pretty_generate(data)
     end
 
-    desc 'create_auth_key', 'create new auth key'
-    def create_auth_key
+    desc 'generate_auth_key', 'generate new auth key for Operator'
+    def generate_auth_key
       client = Soracom::Client.new
-      data = client.create_auth_key()
+      data = client.generate_operator_auth_key()
       puts JSON.pretty_generate(data)
     end
 
-    desc 'delete_auth_key', 'delete existing auth key'
+    desc 'delete_auth_key', 'delete existing auth key for Operator'
     option :auth_key_id, type: :string, required: true, desc: 'auth key id starting "keyId-"'
     def delete_auth_key
       client = Soracom::Client.new
-      data = client.delete_auth_key(options.auth_key_id)
+      data = client.delete_operator_auth_key(options.auth_key_id)
       puts JSON.pretty_generate(data)
     end
   end
 
+  class User < Thor
+    desc 'list_users', 'list users under Operator'
+    def list_users
+      client = Soracom::Client.new
+      data = client.list_users()
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'delete_user', 'delete user under Operator'
+    option :user_name, required: true, desc: 'User name'
+    def delete_user
+      client = Soracom::Client.new
+      data = client.delete_user(options.user_name)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'get_user', 'get user info under Operator'
+    option :user_name, required: true, desc: 'User name'
+    def get_user
+      client = Soracom::Client.new
+      data = client.get_user(options.user_name)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'create_user', 'create user under Operator'
+    option :user_name, required: true, desc: 'User name'
+    option :description, desc: 'description for the user'
+    def create_user
+      client = Soracom::Client.new
+      data = client.create_user(options.user_name, options.description)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'update_user', 'update user under Operator'
+    option :user_name, required: true, desc: 'User name'
+    option :description, desc: 'description for the user'
+    def update_user
+      client = Soracom::Client.new
+      data = client.update_user(options.user_name, options.description)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'list_auth_keys', 'list auth keys for user'
+    option :user_name, desc: 'User name'
+    def list_auth_keys
+      client = Soracom::Client.new
+      data = client.list_users_auth_key(options.user_name)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'generate_auth_key', 'generate new auth key for user'
+    option :user_name, desc: 'User name'
+    def generate_auth_key
+      client = Soracom::Client.new
+      data = client.generate_users_auth_key(options.user_name)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'delete_auth_key', 'delete existing auth key for user'
+    option :user_name, desc: 'User name'
+    option :auth_key_id, type: :string, required: true, desc: 'auth key id starting "keyId-"'
+    def delete_auth_key
+      client = Soracom::Client.new
+      data = client.delete_users_auth_key(options.user_name, options.auth_key_id)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'get_auth_key', 'get auth key info for user'
+    option :user_name, desc: 'User name'
+    option :auth_key_id, type: :string, required: true, desc: 'auth key id starting "keyId-"'
+    def get_auth_key
+      client = Soracom::Client.new
+      data = client.get_users_auth_key(options.user_name, options.auth_key_id)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'delete_password', 'delete existing password for user'
+    option :user_name, desc: 'User name'
+    def delete_password
+      client = Soracom::Client.new
+      data = client.delete_user_password(options.user_name)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'has_password', 'check if the user has password'
+    option :user_name, desc: 'User name'
+    def has_password
+      client = Soracom::Client.new
+      data = client.has_user_password(options.user_name)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'create_password', 'create passwod for the user'
+    option :user_name, desc: 'User name'
+    option :password, desc: 'Password for the user'
+    def create_password
+      client = Soracom::Client.new
+      data = client.create_user_password(options.user_name, options.password)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'get_permission', 'get permission for the user'
+    option :user_name, desc: 'User name'
+    def get_permission
+      client = Soracom::Client.new
+      data = client.get_user_permission(options.user_name)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'upadte_permission', 'update permission for the user'
+    option :user_name, desc: 'User name'
+    option :permission, required:true, desc: 'Permission string for the user'
+    option :description, desc: 'Description for the permission'
+    def update_permission
+      client = Soracom::Client.new
+      data = client.update_user_permission(options.user_name, options.permission, options.description)
+      puts JSON.pretty_generate(data)
+    end
+    
+  end
+
+  class Role < Thor
+  end
+
   # Using Thor for CLI Implementation
   class CLI < Thor
+    class_option :profile, default:"default", desc: 'profile to use, stored in $HOME/.soracom/PROFILE.json'
     register(Subscriber, 'subscriber', 'subscriber <command>', 'Subscriber related operations')
     register(Subscriber, 'sim', 'sim <command>', 'Subscriber related operations(alias)')
     register(Group, 'group', 'group <command>', 'Group related operations')
     register(EventHandler, 'event_handler', 'event_handler <command>', 'Event Handler related operations')
     register(Stats, 'stats', 'stats <command>', 'Stats related operations')
     register(Operator, 'operator', 'operator <command>', 'Operator related operations')
+    register(User, 'user', 'user <command>', 'SAM User related operations')
+    register(Role, 'role', 'role <command>', 'Role related operations')
 
     desc 'auth', 'test authentication'
     def auth
-      puts 'testing authentication...'
+      puts "testing authentication... #{options.profile}"
       begin
-        client = Soracom::Client.new
+        client = Soracom::Client.new(profile:options.profile)
         puts <<EOS
 authentication succeeded.
 apiKey: #{client.api_key}

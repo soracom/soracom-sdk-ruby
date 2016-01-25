@@ -13,6 +13,7 @@ module Soracom
   class Client
     # 設定されなかった場合には、環境変数から認証情報を取得
     def initialize(
+        profile:'default',
         endpoint:ENV['SORACOM_ENDPOINT'],
         email:ENV['SORACOM_EMAIL'], password:ENV['SORACOM_PASSWORD'],
         auth_key_id:ENV['SORACOM_AUTH_KEY_ID'], auth_key:ENV['SORACOM_AUTH_KEY']
@@ -381,7 +382,7 @@ module Soracom
     end
 
     # SAMユーザーの権限を更新する
-    def update_user_permission(username=@auth[:userName], description, permission)
+    def update_user_permission(username=@auth[:userName], permission="", description="")
       @api.put(path: "/operators/#{@auth[:operatorId]}/users/#{username}/permission", payload:{description: description, permission: permission})
     end
 
