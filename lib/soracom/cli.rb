@@ -288,6 +288,7 @@ module SoracomCli
     end
   end
 
+  # Operator related commands
   class Operator < Thor
     desc 'list_auth_keys', 'list auth keys for Operator'
     def list_auth_keys
@@ -312,6 +313,7 @@ module SoracomCli
     end
   end
 
+  # User related commands
   class User < Thor
     desc 'list_users', 'list users under Operator'
     def list_users
@@ -433,6 +435,7 @@ module SoracomCli
 
   end
 
+  # Role related commands
   class Role < Thor
     desc 'list_roles', 'list roles'
     def list_roles
