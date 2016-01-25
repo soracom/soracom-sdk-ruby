@@ -402,12 +402,12 @@ module Soracom
     end
 
     # Role を新しく追加する
-    def create_role(role_id, description='', permission)
+    def create_role(role_id, permission, description='')
       @api.post(path: "/operators/#{@auth[:operatorId]}/roles/#{role_id}", payload:{description: description, permission: permission})
     end
 
     # Role を編集する
-    def update_role(role_id, description='', permission)
+    def update_role(role_id, permission, description='')
       @api.put(path: "/operators/#{@auth[:operatorId]}/roles/#{role_id}", payload:{description: description, permission: permission})
     end
 
@@ -417,13 +417,13 @@ module Soracom
     end
 
     # SAMユーザーのロール一覧取得
-    def list_user_roles(usre_name)
+    def list_user_roles(user_name)
       @api.get(path: "/operators/#{@auth[:operatorId]}/users/#{user_name}/roles")
     end
 
     # SAMユーザーにロールをアタッチ
-    def attach_role_to_user(user_name)
-      @api.post(path: "/operators/#{@auth[:operatorId]}/users/#{user_name}")
+    def attach_role_to_user(user_name, role_id)
+      @api.post(path: "/operators/#{@auth[:operatorId]}/users/#{user_name}/roles", payload: {roleId: role_id})
     end
 
     # SAMユーザーからロールをデタッチ

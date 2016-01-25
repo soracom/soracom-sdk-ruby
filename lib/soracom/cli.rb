@@ -430,10 +430,86 @@ module SoracomCli
       data = client.update_user_permission(options.user_name, options.permission, options.description)
       puts JSON.pretty_generate(data)
     end
-    
+
   end
 
   class Role < Thor
+    desc 'list_roles', 'list roles'
+    def list_roles
+      client = Soracom::Client.new
+      data = client.list_roles()
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'delete_roles', 'delete role'
+    option :role_id, required: true, desc: 'ID of the role'
+    def delete_role
+      client = Soracom::Client.new
+      data = client.delete_role()
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'get_role', 'get information of role'
+    option :role_id, required: true, desc: 'ID of the role'
+    def get_role
+      client = Soracom::Client.new
+      data = client.get_role(options.role_id)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'create_role', 'create a role'
+    option :role_id, required: true, desc: 'ID of the role'
+    option :permission, required: true, desc: 'Permission for the role'
+    option :description, desc: 'Descroption for the role'
+    def create_role
+      client = Soracom::Client.new
+      data = client.create_role(options.role_id, options.permission, options.description)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'update_role', 'update existing role'
+    option :role_id, required: true, desc: 'ID of the role'
+    option :permission, required: true, desc: 'Permission for the role'
+    option :description, desc: 'Descroption for the role'
+    def update_role
+      client = Soracom::Client.new
+      data = client.update_role(options.role_id, options.permission, options.description)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'list_role_attached_users', 'list users having a role attached'
+    def list_role_attached_users
+      client = Soracom::Client.new
+      data = client.list_role_attached_users
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'list_user_roles', 'list roles attached to a user'
+    option :user_name, required: true, desc: 'user name'
+    def list_user_roles
+      client = Soracom::Client.new
+      data = client.list_user_roles(options.user_name)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'attach_role_to_user', 'attach role to user'
+    option :user_name, required: true, desc: 'user name'
+    option :role_id, required: true, desc: 'role_id'
+    def attach_role_to_user
+      client = Soracom::Client.new
+      data = client.attach_role_to_user(options.user_name, options.role_id)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'delete_role_from_user', 'delete role from user'
+    option :user_name, required: true, desc: 'user name'
+    option :role_id, required: true, desc: 'role_id'
+    def delete_role_from_user
+      client = Soracom::Client.new
+      data = client.delete_role_from_user(options.user_name, options.role_id)
+      puts JSON.pretty_generate(data)
+    end
+
   end
 
   # Using Thor for CLI Implementation
