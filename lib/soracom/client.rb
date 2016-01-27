@@ -13,25 +13,35 @@ module Soracom
   class Client
     # 設定されなかった場合には、環境変数から認証情報を取得
     def initialize(
-        profile:'default',
-        endpoint:ENV['SORACOM_ENDPOINT'],
-        email:ENV['SORACOM_EMAIL'], password:ENV['SORACOM_PASSWORD'],
-        auth_key_id:ENV['SORACOM_AUTH_KEY_ID'], auth_key:ENV['SORACOM_AUTH_KEY']
+        profile: nil,
+        endpoint: ENV['SORACOM_ENDPOINT'] || API_BASE_URL,
+        email:ENV['SORACOM_EMAIL'], password:ENV['SORACOM_PASSOWRD'],
+        auth_key_id:ENV['SORACOM_AUTH_KEY_ID'], auth_key:ENV['SORACOM_AUTH_KEY'],
+        operator_id:ENV['SORACOM_OPERATOR_ID'], user_name:ENV['SORACOM_USER_NAME']
       )
       @log = Logger.new(STDERR)
       @log.level = ENV['SORACOM_DEBUG'] ? Logger::DEBUG : Logger::WARN
+      @endpoint = endpoint
       begin
-        if auth_key_id && auth_key
-          @auth = auth_by_key(auth_key_id, auth_key, endpoint)
+        if profile
+          @auth = auth_by_profile(profile)
+        elsif auth_key_id && auth_key
+          @auth = auth_by_key(auth_key_id, auth_key, @endpoint)
         elsif email && password
-          @auth = auth(email, password, endpoint)
+          @auth = auth_by_email(email, password, @endpoint)
+        elsif operator_id && user_name && password
+          @auth = auth_by_user(operator_id, user_name, password, @endpoint)
         else
-          fail 'Could not find any credentials(authKeyId & authKey or email & password)'
+          @auth = auth_by_profile('default')
         end
       rescue => evar
         abort 'ERROR: ' + evar.to_s
       end
-      @api = Soracom::ApiClient.new(@auth, endpoint)
+      if @auth
+        @api = Soracom::ApiClient.new(@auth, @endpoint)
+      else
+        fail 'Could not find any credentials(authKeyId & authKey or email & password or operatorId & userName and password)'
+      end
     end
 
     # 特定Operator下のSubscriber一覧を取
@@ -469,7 +479,7 @@ module Soracom
     private
 
     # authenticate by email and password
-    def auth(email, password, endpoint)
+    def auth_by_email(email, password, endpoint)
       endpoint = API_BASE_URL if endpoint.nil?
       res = RestClient.post endpoint + '/auth',
                             { email: email, password: password },
@@ -490,6 +500,33 @@ module Soracom
       result = JSON.parse(res.body)
       fail result['message'] if res.code != '200'
       Hash[JSON.parse(res.body).map { |k, v| [k.to_sym, v] }]
+    end
+
+    # authenticate by operator_id and user_name and password
+    def auth_by_user(operator_id, user_name, password, endpoint)
+      endpoint = API_BASE_URL if endpoint.nil?
+      res = RestClient.post endpoint + '/auth',
+                            { operatorId: operator_id, userName: user_name, password: password },
+                            'Content-Type' => 'application/json',
+                            'Accept' => 'application/json'
+      result = JSON.parse(res.body)
+      fail result['message'] if res.code != '200'
+      Hash[JSON.parse(res.body).map { |k, v| [k.to_sym, v] }]
+    end
+
+    def auth_by_profile(profile)
+      profile_string = open( "#{ENV['HOME']}/.soracom/#{profile}.json").read
+      profile_data = JSON.parse(profile_string)
+      @endpoint = profile_data.fetch('endpoint', @endpoint)
+      if profile_data['authKeyId'] && profile_data['authKey']
+        @auth = auth_by_key(profile_data['authKeyId'], profile_data['authKey'], @endpoint)
+      elsif profile_data['email'] && profile_data['password']
+        @auth = auth_by_email(profile_data['email'], profile_data['password'], @endpoint)
+      elsif profile_data['operatorId'] && profile_data['userName'] && profile_data['password']
+        @auth = auth_by_user(profile_data['operatorId'], profile_data['userName'], profile_data['password'], @endpoint)
+      else
+        return nil
+      end
     end
 
     def extract_jwt(jwt)
