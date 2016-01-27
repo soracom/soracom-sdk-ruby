@@ -13,24 +13,35 @@ module Soracom
   class Client
     # 設定されなかった場合には、環境変数から認証情報を取得
     def initialize(
-        endpoint:ENV['SORACOM_ENDPOINT'],
-        email:ENV['SORACOM_EMAIL'], password:ENV['SORACOM_PASSWORD'],
-        auth_key_id:ENV['SORACOM_AUTH_KEY_ID'], auth_key:ENV['SORACOM_AUTH_KEY']
+        profile: nil,
+        endpoint: ENV['SORACOM_ENDPOINT'] || API_BASE_URL,
+        email:ENV['SORACOM_EMAIL'], password:ENV['SORACOM_PASSOWRD'],
+        auth_key_id:ENV['SORACOM_AUTH_KEY_ID'], auth_key:ENV['SORACOM_AUTH_KEY'],
+        operator_id:ENV['SORACOM_OPERATOR_ID'], user_name:ENV['SORACOM_USER_NAME']
       )
       @log = Logger.new(STDERR)
       @log.level = ENV['SORACOM_DEBUG'] ? Logger::DEBUG : Logger::WARN
+      @endpoint = endpoint
       begin
-        if auth_key_id && auth_key
-          @auth = auth_by_key(auth_key_id, auth_key, endpoint)
+        if profile
+          @auth = auth_by_profile(profile)
+        elsif auth_key_id && auth_key
+          @auth = auth_by_key(auth_key_id, auth_key, @endpoint)
         elsif email && password
-          @auth = auth(email, password, endpoint)
+          @auth = auth_by_email(email, password, @endpoint)
+        elsif operator_id && user_name && password
+          @auth = auth_by_user(operator_id, user_name, password, @endpoint)
         else
-          fail 'Could not find any credentials(authKeyId & authKey or email & password)'
+          @auth = auth_by_profile('default')
         end
       rescue => evar
         abort 'ERROR: ' + evar.to_s
       end
-      @api = Soracom::ApiClient.new(@auth, endpoint)
+      if @auth
+        @api = Soracom::ApiClient.new(@auth, @endpoint)
+      else
+        fail 'Could not find any credentials(authKeyId & authKey or email & password or operatorId & userName and password)'
+      end
     end
 
     # 特定Operator下のSubscriber一覧を取
@@ -315,15 +326,133 @@ module Soracom
       "https://soracom.zendesk.com/access/jwt?jwt=#{res['token']}&return_to=#{return_to}"
     end
 
-    def list_auth_keys()
+    # SAMユーザー一覧取得
+    def list_users()
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users")
+    end
+
+    # SAMユーザーを削除する
+    def delete_user(username)
+      @api.delete(path: "/operators/#{@auth[:operatorId]}/users/#{username}")
+    end
+
+    # SAMユーザー取得
+    def get_user(username=@auth[:userName])
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users/#{username}")
+    end
+
+    # SAMユーザーを新しく追加する
+    def create_user(username, description='')
+      @api.post(path: "/operators/#{@auth[:operatorId]}/users/#{username}", payload: { description: description })
+    end
+
+    # SAMユーザーを更新する
+    def update_user(username, description='')
+      @api.put(path: "/operators/#{@auth[:operatorId]}/users/#{username}", payload: { description: description })
+    end
+
+    # SAMユーザーのAuthKey一覧取得
+    def list_users_auth_key(username=@auth[:userName])
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users/#{username}/auth_keys")
+    end
+
+    # SAMユーザーのAuthKey生成
+    def generate_users_auth_key(username=@auth[:userName])
+      @api.post(path: "/operators/#{@auth[:operatorId]}/users/#{username}/auth_keys")
+    end
+
+    # SAMユーザーのAuthKey削除
+    def delete_users_auth_key(username, auth_key_id)
+      @api.delete(path: "/operators/#{@auth[:operatorId]}/users/#{username}/auth_keys/#{auth_key_id}")
+    end
+
+    # SAMユーザーのAuthKey取得
+    def get_users_auth_key(username, auth_key_id)
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users/#{username}/auth_keys/#{auth_key_id}")
+    end
+
+    # SAMユーザーのパスワードを削除する
+    def delete_user_password(username=@auth[:userName])
+      @api.delete(path: "/operators/#{@auth[:operatorId]}/users/#{username}/password")
+    end
+
+    # SAMユーザーのパスワードがセットされているかを取得する
+    def has_user_password(username=@auth[:userName])
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users/#{username}/password")
+    end
+
+    # SAMユーザーのパスワードを作成する
+    def create_user_password(username=@auth[:userName], password)
+      @api.post(path: "/operators/#{@auth[:operatorId]}/users/#{username}/password", payload:{password: password})
+    end
+
+    # SAMユーザーの権限設定を取得する
+    def get_user_permission(username=@auth[:userName])
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users/#{username}/permission")
+    end
+
+    # SAMユーザーの権限を更新する
+    def update_user_permission(username=@auth[:userName], permission="", description="")
+      @api.put(path: "/operators/#{@auth[:operatorId]}/users/#{username}/permission", payload:{description: description, permission: permission})
+    end
+
+    # Role一覧取得
+    def list_roles()
+      @api.get(path: "/operators/#{@auth[:operatorId]}/roles")
+    end
+
+    # Role を削除する
+    def delete_role(role_id)
+      @api.delete(path: "/operators/#{@auth[:operatorId]}/roles/#{role_id}")
+    end
+
+    # Role を取得する
+    def get_role(role_id)
+      @api.get(path: "/operators/#{@auth[:operatorId]}/roles/#{role_id}")
+    end
+
+    # Role を新しく追加する
+    def create_role(role_id, permission, description='')
+      @api.post(path: "/operators/#{@auth[:operatorId]}/roles/#{role_id}", payload:{description: description, permission: permission})
+    end
+
+    # Role を編集する
+    def update_role(role_id, permission, description='')
+      @api.put(path: "/operators/#{@auth[:operatorId]}/roles/#{role_id}", payload:{description: description, permission: permission})
+    end
+
+    # Role に紐づくユーザーの一覧を取得する
+    def list_role_attached_users(role_id)
+      @api.get(path: "/operators/#{@auth[:operatorId]}/roles/#{role_id}/users")
+    end
+
+    # SAMユーザーのロール一覧取得
+    def list_user_roles(user_name)
+      @api.get(path: "/operators/#{@auth[:operatorId]}/users/#{user_name}/roles")
+    end
+
+    # SAMユーザーにロールをアタッチ
+    def attach_role_to_user(user_name, role_id)
+      @api.post(path: "/operators/#{@auth[:operatorId]}/users/#{user_name}/roles", payload: {roleId: role_id})
+    end
+
+    # SAMユーザーからロールをデタッチ
+    def delete_role_from_user(user_name, role_id)
+      @api.delete(path: "/operators/#{@auth[:operatorId]}/users/#{user_name}/roles/#{role_id}")
+    end
+
+    # OperatorのAuthKey一覧取得
+    def list_operator_auth_keys()
       @api.get(path: "/operators/#{@auth[:operatorId]}/auth_keys")
     end
 
-    def create_auth_key()
+    # OperatorのAuthKey生成
+    def generate_operator_auth_key()
       @api.post(path: "/operators/#{@auth[:operatorId]}/auth_keys")
     end
 
-    def delete_auth_key(auth_key_id)
+    # OperatorのAuthKey削除
+    def delete_operator_auth_key(auth_key_id)
       @api.delete(path: "/operators/#{@auth[:operatorId]}/auth_keys/#{auth_key_id}")
     end
 
@@ -337,6 +466,11 @@ module Soracom
       @auth[:operatorId]
     end
 
+    # ユーザ名を取得
+    def user_name
+      @auth[:userName]
+    end
+
     # トークンを取得
     def token
       @auth[:token]
@@ -345,7 +479,7 @@ module Soracom
     private
 
     # authenticate by email and password
-    def auth(email, password, endpoint)
+    def auth_by_email(email, password, endpoint)
       endpoint = API_BASE_URL if endpoint.nil?
       res = RestClient.post endpoint + '/auth',
                             { email: email, password: password },
@@ -366,6 +500,33 @@ module Soracom
       result = JSON.parse(res.body)
       fail result['message'] if res.code != '200'
       Hash[JSON.parse(res.body).map { |k, v| [k.to_sym, v] }]
+    end
+
+    # authenticate by operator_id and user_name and password
+    def auth_by_user(operator_id, user_name, password, endpoint)
+      endpoint = API_BASE_URL if endpoint.nil?
+      res = RestClient.post endpoint + '/auth',
+                            { operatorId: operator_id, userName: user_name, password: password },
+                            'Content-Type' => 'application/json',
+                            'Accept' => 'application/json'
+      result = JSON.parse(res.body)
+      fail result['message'] if res.code != '200'
+      Hash[JSON.parse(res.body).map { |k, v| [k.to_sym, v] }]
+    end
+
+    def auth_by_profile(profile)
+      profile_string = open( "#{ENV['HOME']}/.soracom/#{profile}.json").read
+      profile_data = JSON.parse(profile_string)
+      @endpoint = profile_data.fetch('endpoint', @endpoint)
+      if profile_data['authKeyId'] && profile_data['authKey']
+        @auth = auth_by_key(profile_data['authKeyId'], profile_data['authKey'], @endpoint)
+      elsif profile_data['email'] && profile_data['password']
+        @auth = auth_by_email(profile_data['email'], profile_data['password'], @endpoint)
+      elsif profile_data['operatorId'] && profile_data['userName'] && profile_data['password']
+        @auth = auth_by_user(profile_data['operatorId'], profile_data['userName'], profile_data['password'], @endpoint)
+      else
+        return nil
+      end
     end
 
     def extract_jwt(jwt)
