@@ -521,6 +521,41 @@ module SoracomCli
 
   end
 
+  class Credentials < Thor
+    desc 'list_credentials', 'list stored credentials'
+    def list_credentials
+      client = Soracom::Client.new
+      data = client.list_credentials
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'create_credentials', 'create new credentials'
+    option :credentials_id, type: :string, required: true, desc: 'Credentials Id'
+    option :credentials_body, type: :string, required: true, desc: 'Credentials Body as JSON string'
+    def create_credentials
+      if options.credentials_body=~/^[a-z]+:\/\/(.+)/
+        begin
+          content = open(options.credentials_body.sub(/^file:\/\//,'')).read
+          options['credentials_body'] = content
+        rescue Errno::ENOENT
+        rescue SocketError
+          abort "ERROR: Cannot access #{options.credentials_body}."
+        end
+      end
+      client = Soracom::Client.new
+      data = client.create_credentials(options.credentials_id, options.credentials_body)
+      puts JSON.pretty_generate(data)
+    end
+
+    desc 'delete_credentials', 'delete credentials'
+    option :credentials_id, type: :string, required: true, desc: 'credentials Id'
+    def delete_credentials
+      client = Soracom::Client.new
+      data = client.delete_credentials(options.credentials_id)
+      puts JSON.pretty_generate(data)
+    end
+  end
+
   # Using Thor for CLI Implementation
   class CLI < Thor
     class_option :profile, default: 'default', desc: 'profile to use, stored in $HOME/.soracom/PROFILE.json'
@@ -533,6 +568,7 @@ module SoracomCli
     register(Operator, 'operator', 'operator <command>', 'Operator related operations')
     register(User, 'user', 'user <command>', 'SAM User related operations')
     register(Role, 'role', 'role <command>', 'Role related operations')
+    register(Credentials, 'credentials', 'credentials <command>', 'Credentials related operations')
 
     desc 'auth', 'test authentication'
     def auth

@@ -326,6 +326,18 @@ module Soracom
       "https://soracom.zendesk.com/access/jwt?jwt=#{res['token']}&return_to=#{return_to}"
     end
 
+    def list_credentials()
+      @api.get(path: '/credentials')
+    end
+
+    def create_credentials(credentials_id, credentials)
+      @api.post(path: "/credentials/#{credentials_id}", payload: credentials)
+    end
+
+    def delete_credentials(credentials_id)
+      @api.delete(path: "/credentials/#{credentials_id}")
+    end
+
     # SAMユーザー一覧取得
     def list_users()
       @api.get(path: "/operators/#{@auth[:operatorId]}/users")
