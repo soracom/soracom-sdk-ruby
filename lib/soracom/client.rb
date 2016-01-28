@@ -527,7 +527,16 @@ module Soracom
     end
 
     def auth_by_profile(profile)
-      profile_string = open( "#{ENV['HOME']}/.soracom/#{profile}.json").read
+      begin
+        profile_string = open( "#{ENV['HOME']}/.soracom/#{profile}.json").read
+      rescue Errno::ENOENT
+        if profile == 'default'
+          return nil
+        else
+          fail "Could not open #{ENV['HOME']}/.soracom/#{profile}.json"
+        end
+      end
+
       profile_data = JSON.parse(profile_string)
       @endpoint = profile_data.fetch('endpoint', @endpoint)
       if profile_data['authKeyId'] && profile_data['authKey']

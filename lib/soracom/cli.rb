@@ -524,7 +524,7 @@ module SoracomCli
   class Credentials < Thor
     desc 'list_credentials', 'list stored credentials'
     def list_credentials
-      client = Soracom::Client.new
+      client = Soracom::Client.new(profile:options.profile)
       data = client.list_credentials
       puts JSON.pretty_generate(data)
     end
@@ -542,7 +542,7 @@ module SoracomCli
           abort "ERROR: Cannot access #{options.credentials_body}."
         end
       end
-      client = Soracom::Client.new
+      client = Soracom::Client.new(profile:options.profile)
       data = client.create_credentials(options.credentials_id, options.credentials_body)
       puts JSON.pretty_generate(data)
     end
@@ -550,7 +550,7 @@ module SoracomCli
     desc 'delete_credentials', 'delete credentials'
     option :credentials_id, type: :string, required: true, desc: 'credentials Id'
     def delete_credentials
-      client = Soracom::Client.new
+      client = Soracom::Client.new(profile:options.profile)
       data = client.delete_credentials(options.credentials_id)
       puts JSON.pretty_generate(data)
     end
@@ -558,7 +558,7 @@ module SoracomCli
 
   # Using Thor for CLI Implementation
   class CLI < Thor
-    class_option :profile, default: 'default', desc: 'profile to use, stored in $HOME/.soracom/PROFILE.json'
+    class_option :profile, desc: 'profile to use, stored in $HOME/.soracom/PROFILE.json'
 
     register(Subscriber, 'subscriber', 'subscriber <command>', 'Subscriber related operations')
     register(Subscriber, 'sim', 'sim <command>', 'Subscriber related operations(alias)')
