@@ -15,7 +15,7 @@ module Soracom
     def initialize(
         profile: nil,
         endpoint: ENV['SORACOM_ENDPOINT'] || API_BASE_URL,
-        email:ENV['SORACOM_EMAIL'], password:ENV['SORACOM_PASSOWRD'],
+        email:ENV['SORACOM_EMAIL'], password:ENV['SORACOM_PASSWORD'],
         auth_key_id:ENV['SORACOM_AUTH_KEY_ID'], auth_key:ENV['SORACOM_AUTH_KEY'],
         operator_id:ENV['SORACOM_OPERATOR_ID'], user_name:ENV['SORACOM_USER_NAME']
       )
