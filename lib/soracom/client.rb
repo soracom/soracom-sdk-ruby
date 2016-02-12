@@ -17,13 +17,20 @@ module Soracom
         endpoint: ENV['SORACOM_ENDPOINT'] || API_BASE_URL,
         email:ENV['SORACOM_EMAIL'], password:ENV['SORACOM_PASSOWRD'],
         auth_key_id:ENV['SORACOM_AUTH_KEY_ID'], auth_key:ENV['SORACOM_AUTH_KEY'],
-        operator_id:ENV['SORACOM_OPERATOR_ID'], user_name:ENV['SORACOM_USER_NAME']
+        operator_id:ENV['SORACOM_OPERATOR_ID'], user_name:ENV['SORACOM_USER_NAME'],
+        api_key:nil, token:nil
       )
       @log = Logger.new(STDERR)
       @log.level = ENV['SORACOM_DEBUG'] ? Logger::DEBUG : Logger::WARN
       @endpoint = endpoint
       begin
-        if profile
+        if api_key && token && operator_id
+          @auth = {
+            :apiKey => api_key,
+            :token => token,
+            :operatorId => operator_id
+          }
+        elsif profile
           @auth = auth_by_profile(profile)
         elsif auth_key_id && auth_key
           @auth = auth_by_key(auth_key_id, auth_key, @endpoint)
