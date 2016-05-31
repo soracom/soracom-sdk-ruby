@@ -155,7 +155,7 @@ module Soracom
       threads = [], result = []
       imsis.map do |imsi|
         threads << Thread.new do
-          result << { 'imsi' => imsi }.merge(@api.post(path: "/subscribers/#{imsi}/update_tags", payload: tags))
+          result << { 'imsi' => imsi }.merge(@api.put(path: "/subscribers/#{imsi}/tags", payload: tags))
         end
       end
       threads.each(&:join)
