@@ -41,6 +41,13 @@ module SoracomCli
       puts JSON.pretty_generate(client.deactivate_subscriber(options[:imsi]))
     end
 
+    desc 'delete_sessoin', 'delete Subscriber(SIM)s session (disconnect)'
+    option :imsi, type: :array, required: true
+    def delete_session
+      client = Soracom::Client.new(profile:options.profile)
+      puts JSON.pretty_generate(client.delete_subscriber_session(options[:imsi]))
+    end
+
     desc 'terminate', 'terminate Subscriber(SIM)s'
     option :imsi, type: :array, required: true
     option :confirm, type: :string
