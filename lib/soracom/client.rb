@@ -110,6 +110,19 @@ module Soracom
       result
     end
 
+    # SIMの利用休止
+    def delete_subscriber_session(imsis)
+      imsis = [imsis] if imsis.class != Array
+      threads = [], result = []
+      imsis.map do |imsi|
+        threads << Thread.new do
+          result << { 'imsi' => imsi }.merge(@api.post(path: "/subscribers/#{imsi}/delete_session"))
+        end
+      end
+      threads.each(&:join)
+      result
+    end
+
     # SIMの解約
     def terminate_subscriber(imsis)
       imsis = [imsis] if imsis.class != Array
