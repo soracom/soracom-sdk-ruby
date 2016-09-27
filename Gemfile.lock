@@ -1,8 +1,7 @@
 PATH
   remote: .
   specs:
-    soracom (1.1.5)
-      io-console
+    soracom (1.1.6)
       thor
 
 GEM
