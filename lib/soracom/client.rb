@@ -285,7 +285,6 @@ module Soracom
 
     # イベントハンドラーを新規作成する
     def create_event_handler(req)
-      req = transform_json req
       @api.post(path: '/event_handlers', payload: req)
     end
 
