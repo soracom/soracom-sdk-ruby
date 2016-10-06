@@ -313,7 +313,6 @@ module Soracom
 
     # イベントハンドラーを更新する
     def update_event_handler(handler_id, req)
-      req = transform_json req
       @api.put(path: "/event_handlers/#{handler_id}", payload: req)
     end
 
