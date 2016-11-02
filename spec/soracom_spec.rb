@@ -6,7 +6,7 @@ describe Soracom do
   end
 
   it 'initialize fails without any credentials' do
-    expect { Soracom::Client.new }.to raise_error('Could not find any credentials(apikey or email & password)')
+    expect { Soracom::Client.new }.to raise_error(RuntimeError)
   end
 
   it 'initialize fails with invalid credentials' do
