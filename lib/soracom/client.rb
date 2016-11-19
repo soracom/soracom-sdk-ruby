@@ -316,6 +316,16 @@ module Soracom
       @api.put(path: "/event_handlers/#{handler_id}", payload: req)
     end
 
+    # イベントハンドラーを無視する設定を削除
+    def delete_ignore_event_handler(imsi, handler_id)
+      @api.delete(path: "/event_handlers/#{handler_id}/subscribers/#{imsi}/ignore")
+    end
+
+    # イベントハンドラーを無視する設定を追加
+    def set_ignore_event_handler(imsi, handler_id)
+      @api.post(path: "/event_handlers/#{handler_id}/subscribers/#{imsi}/ignore")
+    end
+
     # Subscriber毎のAir使用状況を得る(デフォルトでは直近１日)
     def get_air_usage(imsi:nil, from:(Time.now.to_i - 24 * 60 * 60), to:Time.now.to_i, period:'minutes')
       @api.get(path: "/stats/air/subscribers/#{imsi}", params: { from: from, to: to, period: period })
