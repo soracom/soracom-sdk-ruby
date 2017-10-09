@@ -68,6 +68,8 @@ module Soracom
         @api.get(path: '/subscribers', params: { operatorId: operatorId, limit: limit, status_filter: filter[:value].gsub('|', '%7C') })
       when 'speed_class'
         @api.get(path: '/subscribers', params: { operatorId: operatorId, limit: limit, speed_class_filter: filter[:value] })
+      when 'serial_number'
+        @api.get(path: '/subscribers', params: { operatorId: operatorId, limit: limit, serial_number_filter: filter[:value].gsub('|', '%7C') })
       else
         @api.get(path: '/subscribers', params: { operatorId: operatorId, limit: limit, tag_name: filter[:key], tag_value: filter[:value], tag_value_match_mode: filter[:mode] || 'exact' })
       end
