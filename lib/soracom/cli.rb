@@ -1,5 +1,6 @@
 # coding: utf-8
 
+require 'io/console'
 require 'thor'
 require 'open-uri'
 
