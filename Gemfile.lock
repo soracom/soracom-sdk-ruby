@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    soracom (1.1.8)
+    soracom (1.1.9)
       thor
 
 GEM
