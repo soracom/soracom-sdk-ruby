@@ -14,7 +14,7 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
-    rake (10.4.2)
+    rake (12.3.3)
     rspec (3.3.0)
       rspec-core (~> 3.3.0)
       rspec-expectations (~> 3.3.0)
@@ -35,9 +35,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 1.9)
+  bundler (>= 1.9)
   pry
-  rake (~> 10.0)
+  rake (~> 12.3)
   rspec
   soracom!
-
