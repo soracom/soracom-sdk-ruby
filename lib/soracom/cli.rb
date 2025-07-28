@@ -3,7 +3,7 @@
 require 'io/console'
 require 'thor'
 require 'open-uri'
-
+require 'launchy'
 module SoracomCli
   # SIM related commands
   class Subscriber < Thor
@@ -643,7 +643,11 @@ EOS
     def support
       client = Soracom::Client.new(profile:options.profile)
       url = client.get_support_url
-      system "open '#{url}' &> /dev/null || ( echo open following URL in your browser. ; echo '#{url}' )"
+      begin
+        Launchy.open(url)
+      rescue LoadError, StandardError
+        puts "Please open the following URL in your browser:\n#{url}"
+      end
     end
 
     desc 'version', 'print version'
